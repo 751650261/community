@@ -23,10 +23,13 @@ public class GitHubProvider {
                 .url("https://github.com/login/oauth/access_token")
                 .post(body)
                 .build();
-        try (Response response = client.newCall(request).execute()) {
+        try (
+                Response response = client.newCall(request).execute()) {
             String string = response.body().string();
-            String token =  string.split("&")[0].split("=")[1];
-            } catch (Exception e) {
+            System.out.println(string);
+            String token = string.split("&")[0].split("=")[1];
+            return token;
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -35,13 +38,14 @@ public class GitHubProvider {
     public GitHubUser getUser(String accessToken){
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                .url("https://api.github.com/user?access_token="+accessToken)
+                .url("https://api.github.com/user?access_token=" + accessToken)
                 .build();
-        try (Response response = client.newCall(request).execute()) {
+        try (
+                Response response = client.newCall(request).execute()) {
             String string = response.body().string();
-            GitHubUser gitHubUser = JSON.parseObject(string, GitHubUser.class);
-            return gitHubUser;
+            return JSON.parseObject(string, GitHubUser.class);
         } catch (IOException e) {
+            e.printStackTrace();
         }
         return null;
     }
