@@ -1,7 +1,11 @@
 package com.cwq.springbootcommunity.controller;
 
+import com.cwq.springbootcommunity.dto.QuestionDTO;
+import com.cwq.springbootcommunity.mapper.QuestionMapper;
 import com.cwq.springbootcommunity.mapper.UserMapper;
+import com.cwq.springbootcommunity.model.Question;
 import com.cwq.springbootcommunity.model.User;
+import com.cwq.springbootcommunity.service.QuestionService;
 import jdk.nashorn.internal.parser.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author cwq
@@ -21,22 +26,27 @@ public class IndexController {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private QuestionService questionService;
 
     @GetMapping("/")
-    public String index(HttpServletRequest request){
+    public String index(HttpServletRequest request,Model model){
         Cookie[] cookies = request.getCookies();
-        for(Cookie cookie : cookies)
-        {
-            if(cookie.getName().equals("token")){
-                String token = cookie.getValue();
-                User user = userMapper.findByToken(token);
-                if(user!=null){
-                    request.getSession().setAttribute("user",user);
+        if(cookies!=null && cookies.length!=0) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("token")) {
+                    String token = cookie.getValue();
+                    User user = userMapper.findByToken(token);
+                    if (user != null) {
+                        request.getSession().setAttribute("user", user);
+                    }
+                    break;
                 }
-                break;
             }
         }
 
+        List<QuestionDTO> questionList = questionService.list();
+        model.addAttribute("questions",questionList);
         return "index";
     }
 
