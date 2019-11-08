@@ -1,6 +1,6 @@
 package com.cwq.springbootcommunity.controller;
 
-import com.cwq.springbootcommunity.dto.CommentDTO;
+import com.cwq.springbootcommunity.dto.CommentCreateDTO;
 import com.cwq.springbootcommunity.dto.ResultDTO;
 import com.cwq.springbootcommunity.exception.CustomizeErrorCode;
 import com.cwq.springbootcommunity.mapper.CommentMapper;
@@ -12,8 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author cwq
@@ -28,16 +26,16 @@ public class CommentController {
 
     @ResponseBody
     @RequestMapping(value = "/comment",method = RequestMethod.POST)
-    public Object post(@RequestBody CommentDTO commentDTO,
+    public Object post(@RequestBody CommentCreateDTO commentCreateDTO,
                        HttpServletRequest request){
         User user = (User) request.getSession().getAttribute("user");
         if(user == null){
             return ResultDTO.errorOf(CustomizeErrorCode.NO_LOGIN);
         }
         Comment comment = new Comment();
-        comment.setParentId(commentDTO.getParentId());
-        comment.setContent(commentDTO.getContent());
-        comment.setType(commentDTO.getType());
+        comment.setParentId(commentCreateDTO.getParentId());
+        comment.setContent(commentCreateDTO.getContent());
+        comment.setType(commentCreateDTO.getType());
         comment.setGmtModified(System.currentTimeMillis());
         comment.setGmtCreate(System.currentTimeMillis());
         comment.setCommentator(user.getId());
