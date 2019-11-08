@@ -70,3 +70,6 @@ body{
 .menu .iconn:hover{
     color: #499ef3;
 }
+.question-title{
+    margin-top: 25px;
+}
