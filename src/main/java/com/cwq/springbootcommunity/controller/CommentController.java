@@ -1,7 +1,9 @@
 package com.cwq.springbootcommunity.controller;
 
 import com.cwq.springbootcommunity.dto.CommentCreateDTO;
+import com.cwq.springbootcommunity.dto.CommentDTO;
 import com.cwq.springbootcommunity.dto.ResultDTO;
+import com.cwq.springbootcommunity.enums.CommentTypeEnum;
 import com.cwq.springbootcommunity.exception.CustomizeErrorCode;
 import com.cwq.springbootcommunity.mapper.CommentMapper;
 import com.cwq.springbootcommunity.model.Comment;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author cwq
@@ -44,8 +47,16 @@ public class CommentController {
         comment.setGmtCreate(System.currentTimeMillis());
         comment.setCommentator(user.getId());
         comment.setLikeCount(0L);
-        commentService.insert(comment);
+        comment.setCommentCount(0);
+        commentService.insert(comment,user);
         return ResultDTO.okOf();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/comment/{id}",method = RequestMethod.GET)
+    public ResultDTO <List<CommentDTO>> comments(@PathVariable(name="id")Long id){
+        List<CommentDTO> commentDTOS = commentService.listByTargetId(id, CommentTypeEnum.COMMENT);
+        return ResultDTO.okOf(commentDTOS);
     }
 
 }

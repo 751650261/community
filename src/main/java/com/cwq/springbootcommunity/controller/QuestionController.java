@@ -2,6 +2,7 @@ package com.cwq.springbootcommunity.controller;
 
 import com.cwq.springbootcommunity.dto.CommentDTO;
 import com.cwq.springbootcommunity.dto.QuestionDTO;
+import com.cwq.springbootcommunity.enums.CommentTypeEnum;
 import com.cwq.springbootcommunity.service.CommentService;
 import com.cwq.springbootcommunity.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +27,13 @@ public class QuestionController {
     @GetMapping("/question/{id}")
     public String question(@PathVariable(name="id")Long id, Model model){
         QuestionDTO questionDTO = questionService.getById(id);
-
-        List<CommentDTO> comments =  commentService.listByQuestionId(id);
+        List<QuestionDTO> relatedQuestions = questionService.selectRelated(questionDTO);
+        List<CommentDTO> comments =  commentService.listByTargetId(id, CommentTypeEnum.QUESTION);
         //增加阅读数
         questionService.incView(id);
         model.addAttribute("question",questionDTO);
         model.addAttribute("comments",comments);
+        model.addAttribute("relatedQuestions",relatedQuestions);
         return "question";
     }
 

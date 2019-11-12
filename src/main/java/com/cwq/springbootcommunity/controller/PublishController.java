@@ -1,10 +1,12 @@
 package com.cwq.springbootcommunity.controller;
 
+import com.cwq.springbootcommunity.cache.TagCache;
 import com.cwq.springbootcommunity.dto.QuestionDTO;
 import com.cwq.springbootcommunity.mapper.QuestionMapper;
 import com.cwq.springbootcommunity.model.Question;
 import com.cwq.springbootcommunity.model.User;
 import com.cwq.springbootcommunity.service.QuestionService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,11 +35,13 @@ public class PublishController {
         model.addAttribute("description",question.getDescription());
         model.addAttribute("tag",question.getTag());
         model.addAttribute("id",question.getId());
+        model.addAttribute("tags", TagCache.get());
         return "publish";
     }
 
     @GetMapping("/publish")
-    public String publish(){
+    public String publish(Model model){
+        model.addAttribute("tags", TagCache.get());
         return "publish";
     }
 
@@ -48,9 +52,10 @@ public class PublishController {
             @RequestParam(value = "tag",required = false) String tag,
             @RequestParam(value = "id",required = false) Long id,
             HttpServletRequest request, Model model){
-        model.addAttribute("title",title);
-        model.addAttribute("description",description);
-        model.addAttribute("tag",tag);
+            model.addAttribute("title",title);
+            model.addAttribute("description",description);
+            model.addAttribute("tag",tag);
+            model.addAttribute("tags", TagCache.get());
 
 
         if( title == null || title == ""){
@@ -63,6 +68,11 @@ public class PublishController {
         }
         if( tag == null || tag == ""){
             model.addAttribute("error","标签不能为空");
+            return "publish";
+        }
+        String invalid = TagCache.filterInvalid(tag);
+        if(StringUtils.isNotBlank(invalid)){
+            model.addAttribute("error","输入非法标签"+invalid);
             return "publish";
         }
         User user = (User)request.getSession().getAttribute("user");
